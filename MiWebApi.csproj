@@ -5,6 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>$(MSBuildProjectName.Replace(" MiApiCuadrado", "MiWebApi"))</RootNamespace>
+    <DefaultItemExcludes>$(DefaultItemExcludes);MiWebApi.Tests\**</DefaultItemExcludes>
   </PropertyGroup>
 
   <ItemGroup>

@@ -11,6 +11,8 @@ builder.Services.AddOpenApi();
 builder.Services.AddSingleton<DapperContext>();
 builder.Services.AddScoped<ProductoService>();
 
+builder.Services.AddScoped<MiWebApi.Services.MathService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
