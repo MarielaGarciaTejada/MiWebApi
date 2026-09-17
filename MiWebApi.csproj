@@ -5,7 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>$(MSBuildProjectName.Replace(" MiApiCuadrado", "MiWebApi"))</RootNamespace>
-    <DefaultItemExcludes>$(DefaultItemExcludes);MiWebApi.Tests\**</DefaultItemExcludes>
+    <DefaultItemExcludes>$(DefaultItemExcludes);MiWebApi.Tests\**;BlazorClient\**;WinFormsClient\**;</DefaultItemExcludes>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,5 +13,19 @@
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.3" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="7.0.2" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="BlazorClient\**" />
+    <Content Remove="BlazorClient\**" />
+    <EmbeddedResource Remove="BlazorClient\**" />
+    <None Remove="BlazorClient\**" />
+  </ItemGroup>
+
+	<ItemGroup>
+		<Compile Remove="WinFormsClient\**" />
+		<Content Remove="WinFormsClient\**" />
+		<EmbeddedResource Remove="WinFormsClient\**" />
+		<None Remove="WinFormsClient\**" />
+	</ItemGroup>
 
 </Project>

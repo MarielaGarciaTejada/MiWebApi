@@ -1,0 +1,94 @@
+﻿@page "/calculadoramcd"
+@using System.Text.Json
+@inject HttpClient Http
+
+<PageTitle>Cálculo de MCD</PageTitle>
+
+<h3>Calculadora de Máximo Común Divisor</h3>
+
+<p>
+    Este componente consume el endpoint <code>/api/mcd?dividendo={dividendo}&divisor={divisor}</code>
+    usando el <code>HttpClient</code> inyectado. Si la API no tuviera configurado CORS para el origen
+    de este cliente, la petición fallaría en la consola del navegador.
+</p>
+
+<div class="mb-3">
+    <label for="dividendo" class="form-label">Dividendo</label>
+    <input id="dividendo" type="number" class="form-control" style="max-width: 250px;" @bind="dividendo" />
+</div>
+
+<div class="mb-3">
+    <label for="divisor" class="form-label">Divisor</label>
+    <input id="divisor" type="number" class="form-control" style="max-width: 250px;" @bind="divisor" />
+</div>
+
+<button class="btn btn-primary" @onclick="Calcular" disabled="@calculando">
+    @(calculando ? "Calculando..." : "Calcular MCD")
+</button>
+
+@if (resultado is not null)
+{
+    <p class="mt-3 alert alert-success" style="max-width: 400px;">
+        El MCD de @dividendoCalculado y @divisorCalculado es: <strong>@resultado</strong>
+    </p>
+}
+
+@if (error is not null)
+{
+    <p class="mt-3 text-danger">Error: @error</p>
+}
+
+
+@code {
+    private int dividendo;
+    private int divisor;
+    private int dividendoCalculado;
+    private int divisorCalculado;
+    private string? resultado;
+    private string? error;
+    private bool calculando;
+
+    private async Task Calcular()
+    {
+        calculando = true;
+        error = null;
+        resultado = null;
+
+        try
+        {
+            var response = await Http.GetAsync($"api/mcd?dividendo={dividendo}&divisor={divisor}");
+            var contenido = await response.Content.ReadAsStringAsync();
+
+            if (response.IsSuccessStatusCode)
+            {
+                // aqui extrae solo la propiedad "mcd" del JSON devuelto por la API
+                using var doc = JsonDocument.Parse(contenido);
+                if (doc.RootElement.TryGetProperty("mcd", out var mcdProp))
+                {
+                    resultado = mcdProp.GetInt32().ToString();
+                }
+                else
+                {
+                    resultado = contenido;
+                }
+
+                dividendoCalculado = dividendo;
+                divisorCalculado = divisor;
+            }
+            else
+            {
+                error = contenido;
+            }
+        }
+        catch (Exception ex)
+        {
+            // Un error de red o de CORS bloqueado por el navegador cae acá.
+            error = $"No se pudo contactar a la API: {ex.Message}";
+        }
+        finally
+        {
+            calculando = false;
+        }
+    }
+
+}
