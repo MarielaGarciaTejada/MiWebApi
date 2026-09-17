@@ -39,7 +39,7 @@ Capturas mostrando que la Api funciona correctamente:
 *Prueba del endpoint mostrando los productos en JSON:*
 ![Prueba de lista de productos](./CapturasEvidencias/Tarea2_ListaProductos.png)
 
-# Api #3 Historial de Cálculos y Cliente Windows Forms
+# Api #3 Historial de Cálculos y Clientes Blazor WebAssembly y Windows Forms
 
 Se implementó el registro y consulta del historial de operaciones de Máximo Común Divisor (MCD) tanto en la Web API como en el cliente de escritorio:
 
@@ -47,6 +47,12 @@ Se implementó el registro y consulta del historial de operaciones de Máximo Co
 * **Endpoints Minimal API**:
   * `GET /api/math/mcd/{dividendo}/{divisor}`: Calcula el MCD ejecutando el algoritmo de Euclides mediante `MathService` y guarda automáticamente el registro en el historial.
   * `GET /api/historial`: Retorna la lista de todas las operaciones registradas para consumo de los clientes.
+* 
+* **Cliente Web Blazor (`BlazorClient`)**:
+  * Aplicación web interactiva construida en Blazor que consume la Web API desplegada en Azure de forma asíncrona mediante `HttpClient`.
+  * Componente `CalculadoraMCD.razor` para ingresar dividendo y divisor, ejecutar el cálculo y desplegar los resultados de manera reactiva.
+  * Integración con la política de CORS configurada en `MiWebApi`, permitiendo la comunicación segura entre el navegador y el servicio.
+	
 * **Cliente Windows Forms (`WinFormsClient`)**: 
   * Formulario desacoplado (`FrmCalculadoraMcd`) que consume la API desplegada en Azure App Service de manera asíncrona mediante `HttpClient`.
   * Visualización y actualización automática del historial de cálculos en un `DataGridView` a través de un DTO local.
