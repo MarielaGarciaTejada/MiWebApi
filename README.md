@@ -39,5 +39,18 @@ Capturas mostrando que la Api funciona correctamente:
 *Prueba del endpoint mostrando los productos en JSON:*
 ![Prueba de lista de productos](./CapturasEvidencias/Tarea2_ListaProductos.png)
 
+# Api #3 Historial de Cálculos y Cliente Windows Forms
+
+Se implementó el registro y consulta del historial de operaciones de Máximo Común Divisor (MCD) tanto en la Web API como en el cliente de escritorio:
+
+* **Almacén en memoria (`HistorialCalculoService`)**: Servicio registrado como *Singleton* que almacena las operaciones realizadas (dividendo, divisor, resultado y fecha UTC) de forma segura para entornos multihilo utilizando mecanismos de sincronización (`lock`).
+* **Endpoints Minimal API**:
+  * `GET /api/math/mcd/{dividendo}/{divisor}`: Calcula el MCD ejecutando el algoritmo de Euclides mediante `MathService` y guarda automáticamente el registro en el historial.
+  * `GET /api/historial`: Retorna la lista de todas las operaciones registradas para consumo de los clientes.
+* **Cliente Windows Forms (`WinFormsClient`)**: 
+  * Formulario desacoplado (`FrmCalculadoraMcd`) que consume la API desplegada en Azure App Service de manera asíncrona mediante `HttpClient`.
+  * Visualización y actualización automática del historial de cálculos en un `DataGridView` a través de un DTO local.
+
+
 ##
 *Elaborado por: Mariela García Tejada*

@@ -1,4 +1,5 @@
 using System.Net.Http.Json;
+using System.Text.Json;
 using System.Windows.Forms;
 
 namespace WinFormsClient
@@ -37,6 +38,9 @@ namespace WinFormsClient
 
                 if (respuesta.IsSuccessStatusCode)
                 {
+                    using var doc = JsonDocument.Parse(contenido);
+                    int mcd = doc.RootElement.GetProperty("mcd").GetInt32();
+
                     lblResultado.Text = $"MCD: {contenido}";
                     await CargarHistorialAsync();
                 }
