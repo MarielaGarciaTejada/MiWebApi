@@ -41,7 +41,8 @@ namespace WinFormsClient
                     using var doc = JsonDocument.Parse(contenido);
                     int mcd = doc.RootElement.GetProperty("mcd").GetInt32();
 
-                    lblResultado.Text = $"MCD: {contenido}";
+                    lblResultado.Text = $"Resultado: {mcd}";
+                    
                     await CargarHistorialAsync();
                 }
                 else
