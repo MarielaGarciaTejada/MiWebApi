@@ -42,12 +42,12 @@ builder.Services.AddScoped<MiWebApi.Services.MathService>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-//if (app.Environment.IsDevelopment())
-//{
-//    app.MapOpenApi();
-//}
-app.MapOpenApi();
+//Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi();
+}
+
 
 app.MapScalarApiReference();
 
