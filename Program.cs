@@ -47,6 +47,7 @@ var app = builder.Build();
 //{
 //    app.MapOpenApi();
 //}
+app.MapOpenApi();
 
 app.MapScalarApiReference();
 
