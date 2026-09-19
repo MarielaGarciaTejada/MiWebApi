@@ -9,8 +9,10 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 // Registro de servicios en el contenedor de dependencias
+
 builder.Services.AddSingleton<MathService>();
-builder.Services.AddSingleton<HistorialCalculoService>();
+builder.Services.AddScoped<HistorialCalculoService>();
+
 
 //La política de CORS
 builder.Services.AddCors(options =>
@@ -56,12 +58,12 @@ app.MapControllers();
 
 // Endpoint de cálculo usando MathService e HistorialCalculoService
 app.MapGet("/api/math/mcd/{dividendo:int}/{divisor:int}",
-    Results<Ok<int>, BadRequest<string>> (int dividendo, int divisor, MathService mathService, HistorialCalculoService historial) =>
+    async Task<Results<Ok<int>, BadRequest<string>>> (int dividendo, int divisor, MathService mathService, HistorialCalculoService historial) =>
     {
         try
         {
             int resultado = mathService.CalcularMcd(dividendo, divisor);
-            historial.Registrar(dividendo, divisor, resultado);
+            historial.RegistrarAsync(dividendo, divisor, resultado);
             return TypedResults.Ok(resultado);
         }
         catch (Exception ex)
@@ -72,21 +74,21 @@ app.MapGet("/api/math/mcd/{dividendo:int}/{divisor:int}",
 .WithName("GetMcd");
 
 // Endpoints del historial
-app.MapGet("/api/historial", (HistorialCalculoService historial) =>
-    TypedResults.Ok(historial.GetAll()))
+app.MapGet("/api/historial", async (HistorialCalculoService historial) =>
+    TypedResults.Ok(await historial.GetAllAsync()))
     .WithName("GetHistorial");
 
 app.MapGet("/api/historial/{id:int}",
-    Results<Ok<HistorialCalculo>, NotFound> (int id, HistorialCalculoService historial) =>
+   async Task<Results<Ok<HistorialCalculo>, NotFound>> (int id, HistorialCalculoService historial) =>
     {
-        var item = historial.GetById(id);
+        var item = await historial.GetByIdAsync(id);
         return item is not null ? TypedResults.Ok(item) : TypedResults.NotFound();
     })
 .WithName("GetHistorialItem");
 
 app.MapDelete("/api/historial/{id:int}",
-    Results<NoContent, NotFound> (int id, HistorialCalculoService historial) =>
-        historial.Delete(id) ? TypedResults.NoContent() : TypedResults.NotFound())
+    async Task<Results<NoContent, NotFound>> (int id, HistorialCalculoService historial) =>
+        await historial.DeleteAsync(id) ? TypedResults.NoContent() : TypedResults.NotFound())
     .WithName("DeleteHistorialItem");
 
 app.Run();

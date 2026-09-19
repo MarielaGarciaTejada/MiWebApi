@@ -1,5 +1,5 @@
 using Dapper;
-using MiWebApi.Api.Models; // Usamos el namespace que tienes en tu controlador
+using MiWebApi.Api.Models;
 using MiWebApi.DbContext;
 using System.Collections.Generic;
 
