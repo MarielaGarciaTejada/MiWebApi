@@ -39,24 +39,100 @@ Capturas mostrando que la Api funciona correctamente:
 *Prueba del endpoint mostrando los productos en JSON:*
 ![Prueba de lista de productos](./CapturasEvidencias/Tarea2_ListaProductos.png)
 
-# Api #3 Historial de Cálculos y Clientes Blazor WebAssembly y Windows Forms
+# Api #3 Historial de Cálculos y Clientes Blazor WebAssemblY y Windows Forms
+## Demo de consumo de Web API y Persistencia con Azure SQL
 
-Se implementó el registro y consulta del historial de operaciones de Máximo Común Divisor (MCD) tanto en la Web API como en el cliente de escritorio:
+Esta solución muestra cómo consumir una Web API REST en ASP.NET Core desde dos tipos de clientes, persistiendo el historial de operaciones en una base de datos relacional en la nube:
 
-* **Almacén en memoria (`HistorialCalculoService`)**: Servicio registrado como *Singleton* que almacena las operaciones realizadas (dividendo, divisor, resultado y fecha UTC) de forma segura para entornos multihilo utilizando mecanismos de sincronización (`lock`).
-* **Endpoints Minimal API**:
-  * `GET /api/math/mcd/{dividendo}/{divisor}`: Calcula el MCD ejecutando el algoritmo de Euclides mediante `MathService` y guarda automáticamente el registro en el historial.
-  * `GET /api/historial`: Retorna la lista de todas las operaciones registradas para consumo de los clientes.
-* 
-* **Cliente Web Blazor (`BlazorClient`)**:
-  * Aplicación web interactiva construida en Blazor que consume la Web API desplegada en Azure de forma asíncrona mediante `HttpClient`.
-  * Componente `CalculadoraMCD.razor` para ingresar dividendo y divisor, ejecutar el cálculo y desplegar los resultados de manera reactiva.
-  * Integración con la política de CORS configurada en `MiWebApi`, permitiendo la comunicación segura entre el navegador y el servicio.
-	
-* **Cliente Windows Forms (`WinFormsClient`)**: 
-  * Formulario desacoplado (`FrmCalculadoraMcd`) que consume la API desplegada en Azure App Service de manera asíncrona mediante `HttpClient`.
-  * Visualización y actualización automática del historial de cálculos en un `DataGridView` a través de un DTO local.
+- Blazor WebAssembly
+- WinForms
 
+La API expone el cálculo del Máximo Común Divisor (MCD) y la gestión de un historial persistido en Azure SQL mediante Dapper. Ambos clientes consumen los mismos endpoints REST.
+
+Se implementó una solución completa para el cálculo del Máximo Común Divisor (MCD) con persistencia relacional en la nube, consumo multiplataforma y despliegue continuo:
+  
+## Clientes Consumidores:
+* **Cliente Web Blazor WebAssembly (`BlazorClient`)**:
+  * Aplicación web interactiva construida en Blazor que consume la API en Azure mediante `HttpClient`.
+  * Componente reactivo `CalculadoraMCD.razor` para ingresar los valores, ejecutar el cálculo y refrescar automáticamente la tabla de historial alojada en Azure SQL.
+  * Configuración de políticas de **CORS** en el backend para permitir la comunicación segura entre el navegador y la API.
+* **Cliente de Escritorio Windows Forms (`WinFormsClient`)**:
+  * Formulario desacoplado (`FrmCalculadoraMcd`) que consume la API desplegada en Azure App Service de forma asíncrona.
+  * Visualización y actualización en tiempo real del historial de Azure SQL mediante un `DataGridView` enlazado a un DTO local.
+ 
+## Base de datos (Azure SQL)
+
+Base de datos **Azure SQL Database** (`McdDb`) alojada en la nube:
+
+- **Tabla:** `HistorialCalculo`
+- **Acceso a datos con Dapper** para operaciones de inserción, consulta y borrado de alto rendimiento.
+
+### Script de la tabla
+
+```sql
+CREATE TABLE HistorialCalculo (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Dividendo INT NOT NULL,
+    Divisor INT NOT NULL,
+    Resultado INT NOT NULL,
+    Fecha DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME()
+);
+```
+
+## Requisitos
+- .NET 10 SDK (o versión correspondiente instalada)
+- Visual Studio 2026 o VS Code con C#
+- Cuenta de Azure con Azure SQL Database (o una instancia local de SQL Server)
+
+## Ejemplo estructurado para appsettings.json
+```json
+"ConnectionStrings": {
+  "DefaultConnection": "Server=tcp:servidor-ejemplo.database.windows.net,1433;Initial Catalog=MiBaseDeDatosDb;Persist Security Info=False;User ID=admin_usuario;Password=TuPasswordSeguro123!;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+}
+```
+
+## Ejecutar la solución
+
+### 1. Ejecutar la API
+```Bash
+dotnet run --project MiWebApi/MiWebApi.csproj
+```
+La API queda disponible localmente o mediante la URL de Azure App Service:
+```
+Local: https://localhost:7150 (o el puerto asignado)
+```
+```
+Azure: https://api-calculadora-mcd-dfeefuhsgaazgpay.westus3-01.azurewebsites.net/
+```
+
+### 2. Ejecutar el cliente Blazor
+```Bash
+dotnet run --project BlazorClient/BlazorClient.csproj
+```
+
+### 3. Ejecutar el cliente WinForms
+Desde Visual Studio, selecciona el proyecto WinFormsClient como proyecto de inicio y ejecuta la solución.
+
+O desde consola:
+
+```Bash
+dotnet run --project WinFormsClient/WinFormsClient.csproj
+```
+## Caso de uso principal
+La API expone la operación de MCD y el historial persistido:
+
+GET - `/api/mcd?dividendo={dividendo}&divisor={divisor}`: Calcula el MCD y registra automáticamente el cálculo en Azure SQL.
+
+GET - `/api/historial`: Retorna la lista de cálculos almacenados en la base de datos.
+
+GET - `/api/historial/{id}`: Consulta un registro específico por su identificador.
+
+DELETE - `/api/historial/{id}`: Elimina un registro del historial en la base de datos.
+
+## Notas
+- El cliente WinForms consume los endpoints directamente sin restricciones de navegador.
+- El cliente Blazor requiere que la API tenga CORS habilitado para su origen.
+- A diferencia de un almacén en memoria volátil, la persistencia en Azure SQL asegura que los registros se mantengan disponibles ante reinicios o despliegues del servicio.
 
 ##
 *Elaborado por: Mariela García Tejada*

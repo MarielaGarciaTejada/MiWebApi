@@ -38,6 +38,46 @@
     <p class="mt-3 text-danger">Error: @error</p>
 }
 
+<hr class="mt-4" />
+
+<h4>Historial de cálculos (Azure SQL)</h4>
+
+@if (cargandoHistorial)
+{
+    <p><em>Cargando historial...</em></p>
+}
+else if (historial is null || historial.Count == 0)
+{
+    <p>Todavía no hay cálculos registrados.</p>
+}
+else
+{
+    <table class="table table-striped" style="max-width: 600px;">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Dividendo</th>
+                <th>Divisor</th>
+                <th>Resultado</th>
+                <th>Fecha (UTC)</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in historial)
+            {
+                <tr>
+                    <td>@item.Id</td>
+                    <td>@item.Dividendo</td>
+                    <td>@item.Divisor</td>
+                    <td>@item.Resultado</td>
+                    <td>@item.Fecha</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+
 
 @code {
     private int dividendo;
@@ -47,6 +87,15 @@
     private string? resultado;
     private string? error;
     private bool calculando;
+
+    private List<HistorialCalculoDto>? historial;
+    private bool cargandoHistorial;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarHistorialAsync();
+    }
+
 
     private async Task Calcular()
     {
@@ -74,6 +123,7 @@
 
                 dividendoCalculado = dividendo;
                 divisorCalculado = divisor;
+                await CargarHistorialAsync();
             }
             else
             {
@@ -86,9 +136,32 @@
             error = $"No se pudo contactar a la API: {ex.Message}";
         }
         finally
+        {  calculando = false; }
+    }
+
+
+    private async Task CargarHistorialAsync()
+    {
+        cargandoHistorial = true;
+        try
         {
-            calculando = false;
+            historial = await Http.GetFromJsonAsync<List<HistorialCalculoDto>>("api/historial");
         }
+        catch (Exception ex)
+        {
+            error = $"No se pudo cargar el historial: {ex.Message}";
+        }
+        finally
+        { cargandoHistorial = false; }
+    }
+
+    private class HistorialCalculoDto
+    {
+        public int Id { get; set; }
+        public int Dividendo { get; set; }
+        public int Divisor { get; set; }
+        public int Resultado { get; set; }
+        public DateTime Fecha { get; set; }
     }
 
 }
