@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using MiWebApi.DbContext;
 using MiWebApi.Models;
 using MiWebApi.Services;
+using Scalar.AspNetCore;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -42,10 +43,12 @@ builder.Services.AddScoped<MiWebApi.Services.MathService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
+//if (app.Environment.IsDevelopment())
+//{
+//    app.MapOpenApi();
+//}
+
+app.MapScalarApiReference();
 
 
 app.UseCors("BlazorClientPolicy");
