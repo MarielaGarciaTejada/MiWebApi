@@ -5,30 +5,38 @@ namespace MiWebApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-public class McdController : ControllerBase
-{
-    private readonly MathService _mathService;
-    private readonly HistorialCalculoService _historialService;
-
-    public McdController (MathService mathService, HistorialCalculoService historialService)
+    public class McdController : ControllerBase
     {
-       _mathService = mathService;
-       _historialService = historialService;
-    }
+        private readonly MathService _mathService;
+        private readonly HistorialCalculoService _historialService;
 
-        [HttpGet]
-    public async Task<IActionResult> GetMcd([FromQuery] int dividendo, [FromQuery] int divisor)
+        public McdController(MathService mathService, HistorialCalculoService historialService)
         {
-            int mcd = _mathService.CalcularMcd(dividendo, divisor);
-            await _historialService.RegistrarAsync(dividendo, divisor, mcd);
-            return Ok(new
-            {
-                dividendo = dividendo,
-                divisor = divisor,
-                mcd = mcd
-            });
-            
+            _mathService = mathService;
+            _historialService = historialService;
         }
-}
+
+        [HttpGet("{dividendo:int}/{divisor:int}")]
+        public async Task<IActionResult> GetMcd(int dividendo, int divisor)
+        {
+            try
+            {
+                int mcd = _mathService.CalcularMcd(dividendo, divisor);
+                await _historialService.RegistrarAsync(dividendo, divisor, mcd);
+
+                return Ok(new
+                {
+                    dividendo,
+                    divisor,
+                    mcd
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+    }
 }
 

@@ -58,21 +58,23 @@ app.UseAuthorization();
 app.MapControllers();
 
 // Endpoint de cálculo usando MathService e HistorialCalculoService
-app.MapGet("/api/mcd/{dividendo:int}/{divisor:int}",
-    async Task<Results<Ok<int>, BadRequest<string>>> (int dividendo, int divisor, MathService mathService, HistorialCalculoService historial) =>
-    {
-        try
-        {
-            int resultado = mathService.CalcularMcd(dividendo, divisor);
-            await historial.RegistrarAsync(dividendo, divisor, resultado);
-            return TypedResults.Ok(resultado);
-        }
-        catch (Exception ex)
-        {
-            return TypedResults.BadRequest(ex.Message);
-        }
-    })
-.WithName("GetMcd");
+
+//app.MapGet("/api/mcd/{dividendo:int}/{divisor:int}",
+//    async Task<Results<Ok<int>, BadRequest<string>>> (int dividendo, int divisor, MathService mathService, HistorialCalculoService historial) =>
+//    {
+//        try
+//        {
+//            int resultado = mathService.CalcularMcd(dividendo, divisor);
+//            await historial.RegistrarAsync(dividendo, divisor, resultado);
+//            return TypedResults.Ok(resultado);
+//        }
+//        catch (Exception ex)
+//        {
+//            return TypedResults.BadRequest(ex.Message);
+//        }
+//    })
+//.WithName("GetMcd");
+
 
 // Endpoints del historial
 app.MapGet("/api/historial", async (HistorialCalculoService historial) =>
