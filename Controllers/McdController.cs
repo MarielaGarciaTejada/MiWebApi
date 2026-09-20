@@ -16,7 +16,7 @@ namespace MiWebApi.Controllers
             _historialService = historialService;
         }
 
-        [HttpGet("{dividendo:int}/{divisor:int}")]
+        [HttpGet]
         public async Task<IActionResult> GetMcd(int dividendo, int divisor)
         {
             try
