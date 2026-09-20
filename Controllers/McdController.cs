@@ -16,21 +16,7 @@ namespace MiWebApi.Controllers
             _historialService = historialService;
         }
 
-        [HttpGet]
-        public IActionResult GetMcd(int dividendo, int divisor)
-        {
-            int mcd = _mathService.CalcularMcd(dividendo, divisor);
-
-            return Ok(new
-            {
-                dividendo,
-                divisor,
-                mcd
-            });
-        }
-
-        /*
-        [HttpGet]
+        [HttpGet("{dividendo:int}/{divisor:int}")]
         public async Task<IActionResult> GetMcd(int dividendo, int divisor)
         {
             try
@@ -50,7 +36,7 @@ namespace MiWebApi.Controllers
                 return BadRequest(new { error = ex.Message });
             }
         }
-        */
+        
 
     }
 }

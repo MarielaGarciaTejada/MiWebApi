@@ -25,6 +25,7 @@ builder.Services.AddCors(options =>
                           "https://localhost:7150",
                           "http://127.0.0.1:5128",
                           "https://127.0.0.1:7150")
+              .AllowAnyOrigin()
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
@@ -45,10 +46,11 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
-    app.MapScalarApiReference();
+  
 }
 
+app.MapOpenApi();
+app.MapScalarApiReference();
 
 app.UseCors("BlazorClientPolicy");
 
