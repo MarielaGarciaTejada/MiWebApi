@@ -4,7 +4,7 @@ using MiWebApi.Services;
 namespace MiWebApi.Controllers
 {
     [ApiController]
-   // [Route("api/[controller]")]
+    [Route("api/[controller]")]
 public class McdController : ControllerBase
 {
     private readonly MathService _mathService;
