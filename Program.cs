@@ -15,6 +15,7 @@ builder.Services.AddSingleton<MathService>();
 builder.Services.AddScoped<HistorialCalculoService>();
 
 
+
 //La política de CORS
 builder.Services.AddCors(options =>
 {
