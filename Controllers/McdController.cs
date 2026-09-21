@@ -16,9 +16,22 @@ namespace MiWebApi.Controllers
             _historialService = historialService;
         }
 
+
+        // 1. Soporta Blazor: /api/mcd?dividendo=46&divisor=12
         [HttpGet]
+        public async Task<IActionResult> GetMcdFromQuery([FromQuery] int dividendo, [FromQuery] int divisor)
+        {
+            return await ProcesarCalculo(dividendo, divisor);
+        }
+
+        // /api/mcd/46/12
         [HttpGet("{dividendo:int}/{divisor:int}")]
-        public async Task<IActionResult> GetMcd(int dividendo, int divisor)
+        public async Task<IActionResult> GetMcdFromRoute([FromRoute] int dividendo, [FromRoute] int divisor)
+        {
+            return await ProcesarCalculo(dividendo, divisor);
+        }
+
+        private async Task<IActionResult> ProcesarCalculo(int dividendo, int divisor)
         {
             try
             {
@@ -37,5 +50,6 @@ namespace MiWebApi.Controllers
                 return BadRequest(new { error = ex.Message });
             }
         }
+
     }
 }
