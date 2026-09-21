@@ -1,100 +1,81 @@
-using Microsoft.AspNetCore.Http.HttpResults;
 using MiWebApi.DbContext;
 using MiWebApi.Models;
 using MiWebApi.Services;
 using Scalar.AspNetCore;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
-// Registro de servicios en el contenedor de dependencias
-
+// Servicios y dependencias
 builder.Services.AddSingleton<MathService>();
+builder.Services.AddSingleton<DapperContext>();
 builder.Services.AddScoped<HistorialCalculoService>();
+builder.Services.AddScoped<ProductoService>();
 
-
-
-//La política de CORS
+// CORS abierto para cualquier cliente
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("BlazorClientPolicy", policy =>
     {
-        policy.WithOrigins("http://localhost:5128",
-                          "https://localhost:7150",
-                          "http://127.0.0.1:5128",
-                          "https://127.0.0.1:7150")
-              .AllowAnyOrigin()
+        policy.AllowAnyOrigin()
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
 });
 
-
-
-
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
-builder.Services.AddSingleton<DapperContext>();
-builder.Services.AddScoped<ProductoService>();
 
 var app = builder.Build();
 
-//Configure the HTTP request pipeline.
+app.UseDeveloperExceptionPage();
 
-if (app.Environment.IsDevelopment())
-{
-  
-}
 
 app.MapOpenApi();
 app.MapScalarApiReference();
 
 app.UseCors("BlazorClientPolicy");
-
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
 
 app.MapControllers();
 
-// Endpoint de cálculo usando MathService e HistorialCalculoService
-
-//app.MapGet("/api/mcd/{dividendo:int}/{divisor:int}",
-    //async Task<Results<Ok<int>, BadRequest<string>>> (int dividendo, int divisor, MathService mathService, HistorialCalculoService historial) =>
-    //{
-    //    try
-    //    {
-    //        int resultado = mathService.CalcularMcd(dividendo, divisor);
-    //        await historial.RegistrarAsync(dividendo, divisor, resultado);
-    //        return TypedResults.Ok(resultado);
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        return TypedResults.BadRequest(ex.Message);
-    //    }
-    //})
-//.WithName("GetMcd");
-
-
-// Endpoints del historial
+// Endpoints de historial
 app.MapGet("/api/historial", async (HistorialCalculoService historial) =>
-    TypedResults.Ok(await historial.GetAllAsync()))
-    .WithName("GetHistorial");
+{
+    try
+    {
+        var items = await historial.GetAllAsync();
+        return Results.Ok(items);
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem($"Error en base de datos: {ex.Message}", statusCode: 500);
+    }
+}).WithName("GetHistorial");
 
-app.MapGet("/api/historial/{id:int}",
-   async Task<Results<Ok<HistorialCalculo>, NotFound>> (int id, HistorialCalculoService historial) =>
+app.MapGet("/api/historial/{id:int}", async (int id, HistorialCalculoService historial) =>
+{
+    try
     {
         var item = await historial.GetByIdAsync(id);
-        return item is not null ? TypedResults.Ok(item) : TypedResults.NotFound();
-    })
-.WithName("GetHistorialItem");
+        return item is not null ? Results.Ok(item) : Results.NotFound();
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem($"Error en base de datos: {ex.Message}", statusCode: 500);
+    }
+}).WithName("GetHistorialItem");
 
-app.MapDelete("/api/historial/{id:int}",
-    async Task<Results<NoContent, NotFound>> (int id, HistorialCalculoService historial) =>
-        await historial.DeleteAsync(id) ? TypedResults.NoContent() : TypedResults.NotFound())
-    .WithName("DeleteHistorialItem");
+app.MapDelete("/api/historial/{id:int}", async (int id, HistorialCalculoService historial) =>
+{
+    try
+    {
+        return await historial.DeleteAsync(id) ? Results.NoContent() : Results.NotFound();
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem($"Error en base de datos: {ex.Message}", statusCode: 500);
+    }
+}).WithName("DeleteHistorialItem");
 
 app.Run();
